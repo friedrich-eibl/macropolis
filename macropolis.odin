@@ -89,28 +89,6 @@ load_textures :: proc(textures_p: ^TileTextures) {
 }
 
 
-get_tile_color :: proc(type: TileType) -> rl.Color {
-	color : rl.Color
-	switch type {
-	    	case .Empty:
-			color = rl.Color{30, 30, 30, 255}
-	    	case .Wood:
-			color = rl.Color{34, 139, 34, 255}
-	    	case .Stone:
-			color = rl.Color{120, 120, 120, 255}
-		case .Iron:
-			color = rl.Color{166, 166, 166, 255}
-		case .Gold:
-			color = rl.Color{184, 148, 4, 255}
-	    	case .House:
-	        	color = rl.Color{200, 180, 80, 255}
-	    	case .Road:
-	        	color = rl.Color{80, 80, 80, 255}
-    	}
-	return color
-}
-
-
 get_tile_texture :: proc(type: TileType, textures_p: ^TileTextures) -> rl.Texture2D {
 	return textures_p^[type]
 }
@@ -165,7 +143,7 @@ update_build_menu :: proc(state: ^GameState) {
 }
 
 
-draw_build_menu :: proc(state: ^GameState) {
+draw_build_menu :: proc(state: ^GameState, textures_p: ^TileTextures) {
     	ui_x : i32 = 8
     	ui_y : i32 = 8
 
@@ -177,22 +155,22 @@ draw_build_menu :: proc(state: ^GameState) {
     	    	opt := state.available_types[i]
     	    	y := ui_y + i32(i) * (tile_size + spacing_y)
 
-    	    	color := get_tile_color(opt.type)
+    	    	texture := get_tile_texture(opt.type, textures_p)
 
-    	    	rl.DrawRectangle(
-    	    	    ui_x,
-    	    	    y,
-    	    	    tile_size,
-    	    	    tile_size,
-    	    	    color
-    	    	);
+		rl.DrawTextureEx(
+			texture, 
+			{f32(ui_x), f32(y)}, 
+			0, 
+			0.024, 
+			rl.WHITE
+		)
 
     	    	rl.DrawText(
-    	    	    opt.name,
-    	    	    ui_x + tile_size + 8,
-    	    	    y + (tile_size - font_size) / 2,
-    	    	    font_size,
-    	    	    rl.RAYWHITE
+    	    		opt.name,
+    	    		ui_x + tile_size + 8,
+    	    		y + (tile_size - font_size) / 2,
+    	    		font_size,
+			rl.RAYWHITE
     	    	);
     	}
 }
@@ -224,7 +202,7 @@ main :: proc () {
 		rl.BeginMode2D(camera)
 		draw_grid()
 		draw_game(state_p, textures_p)
-		draw_build_menu(state_p)
+		draw_build_menu(state_p, textures_p)
 		rl.EndMode2D()
         
 		rl.EndDrawing()
