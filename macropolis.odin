@@ -25,6 +25,9 @@ Tile :: struct {
 }
 
 
+TileTextures :: [len(TileType)]rl.Texture2D
+
+
 BuildOption :: struct {
 	type: TileType,
 	name: cstring,
@@ -75,6 +78,17 @@ update_game :: proc (state: ^GameState) {
 }
 
 
+load_textures :: proc(textures_p: ^TileTextures) {
+	textures_p^[TileType.Empty] = rl.LoadTexture("assets/grass.png")
+	textures_p^[TileType.Wood] = rl.LoadTexture("assets/wood.png")
+	textures_p^[TileType.Stone] = rl.LoadTexture("assets/stone.png")
+	textures_p^[TileType.Iron] = rl.LoadTexture("assets/iron.png")
+	textures_p^[TileType.Gold] = rl.LoadTexture("assets/gold.png")
+	textures_p^[TileType.House] = rl.LoadTexture("assets/house.png")
+	textures_p^[TileType.Road] = rl.LoadTexture("assets/road.png")
+}
+
+
 get_tile_color :: proc(type: TileType) -> rl.Color {
 	color : rl.Color
 	switch type {
@@ -97,18 +111,22 @@ get_tile_color :: proc(type: TileType) -> rl.Color {
 }
 
 
-draw_game :: proc (state: ^GameState) {
+get_tile_texture :: proc(type: TileType, textures_p: ^TileTextures) -> rl.Texture2D {
+	return textures_p^[type]
+}
+
+
+draw_game :: proc (state: ^GameState, textures_p: ^TileTextures) {
 	for x in 0 ..< GRID_W {
 		for y in 0 ..< GRID_H {
 	        	tile := state.tiles[x][y]
 			
-			color := get_tile_color(tile.type)
+			texture := get_tile_texture(tile.type, textures_p)
 
-	           	x_px : i32 = x * T_SIZE;
-	           	y_px : i32 = y * T_SIZE;
-	
-	           	 
-	           	rl.DrawRectangle(x_px, y_px, T_SIZE, T_SIZE, color);
+	           	x_px : i32 = x * T_SIZE
+	           	y_px : i32 = y * T_SIZE
+	  		 
+			rl.DrawTextureEx(texture, {f32(x_px), f32(y_px)}, 0, 0.048, rl.WHITE)
 	           	rl.DrawRectangleLines(x_px, y_px, T_SIZE, T_SIZE, rl.BLACK);
 		}
 	}
@@ -127,9 +145,9 @@ update_build_menu :: proc(state: ^GameState) {
     	spacing_y := 6;
 
         for i in 0..<len(state.available_types) {
-            opt := state.available_types[i];
+            opt := state.available_types[i]
 
-            y := ui_y + i * (tile_size + spacing_y);
+            y := ui_y + i * (tile_size + spacing_y)
 
             // bounds of this menu entry (just around the tile + text)
             min_x := f32(ui_x);
@@ -139,7 +157,7 @@ update_build_menu :: proc(state: ^GameState) {
 
             if mouse_pos.x >= min_x && mouse_pos.x <= max_x &&
                mouse_pos.y >= min_y && mouse_pos.y <= max_y {
-                state.selected_type = opt.type;
+                state.selected_type = opt.type
                 return; // done
             }
         }
@@ -182,12 +200,17 @@ draw_build_menu :: proc(state: ^GameState) {
 
 main :: proc () {
     	rl.InitWindow(800, 450, "Macropolis")
+    	// rl.InitWindow(1280, 720, "Macropolis")
+	// rl.ToggleFullscreen();
+
 	position : rl.Vector3 = {0.0, 0.0, 0.0}
 	
 	camera : rl.Camera2D = {}
 	camera.zoom = 1.0
 
 	rl.SetTargetFPS(60)
+	textures_p := new(TileTextures)
+	load_textures(textures_p)
 	state_p := new(GameState)
 	init_game(state_p)
 	
@@ -200,7 +223,7 @@ main :: proc () {
 		
 		rl.BeginMode2D(camera)
 		draw_grid()
-		draw_game(state_p)
+		draw_game(state_p, textures_p)
 		draw_build_menu(state_p)
 		rl.EndMode2D()
         
