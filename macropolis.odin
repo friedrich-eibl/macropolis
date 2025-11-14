@@ -199,8 +199,8 @@ draw_build_menu :: proc(state: ^GameState) {
 
 
 main :: proc () {
-    	rl.InitWindow(800, 450, "Macropolis")
-    	// rl.InitWindow(1280, 720, "Macropolis")
+	rl.InitWindow(800, 450, "Macropolis")
+	// rl.InitWindow(1280, 720, "Macropolis")
 	// rl.ToggleFullscreen();
 
 	position : rl.Vector3 = {0.0, 0.0, 0.0}
@@ -218,8 +218,8 @@ main :: proc () {
 		update_build_menu(state_p)
 		update_game(state_p)
 
-        	rl.BeginDrawing()
-            	rl.ClearBackground(rl.RAYWHITE)
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.RAYWHITE)
 		
 		rl.BeginMode2D(camera)
 		draw_grid()
