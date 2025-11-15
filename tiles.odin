@@ -3,6 +3,20 @@ package macropolis
 import rl "vendor:raylib"
 
 
+ResourceType :: enum {
+	Wood,
+	Stone,
+	Iron,
+	Gold,
+}
+
+
+BuildType :: enum {
+	House,
+	Road,
+}
+
+
 TileType :: enum {
 	Empty,
 	Wood,
